@@ -1,0 +1,43 @@
+<!doctype HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="vendor/aframe-1.0.4.min.js"></script>
+    <script src="vendor/AR.js-3.3.1/aframe-ar.js"></script>
+    <script src="index.js"></script>
+
+    <template id="landscape-warning">
+        <h1>Use in landscape orientation!</h1>
+        <button id="landscape-btn">Switch to full-screen</button>
+    </template>
+
+    <template id="ar-scene">
+        <a-scene vr-mode-ui="enabled: false" stats embedded markerlog renderer="logarithmicDepthBuffer: true;"
+            arjs='patternRatio: 0.8; trackingMethod: best; sourceType: webcam; debugUIEnabled: false; cameraParametersUrl: /vendor/AR.js-3.3.1/camera_para.dat'>
+            
+            <a-assets>
+                <a-asset-item id="bedroom" src="booth__1.glb"></a-asset-item>
+                <video id="thevideo" autoplay loop>
+                    <source src="Spring-WhWc3b3KhnY-240p.webm" type="video/webm">
+                    <source src="Spring-WhWc3b3KhnY-240p.mp4" type="video/mp4">
+                </video>
+            </a-assets>
+
+            <a-marker emitevents="true" id="animated-marker" size="100" type='pattern' url='pattern-50.patt'
+                smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+                <a-entity id="logo" position="0 0 0" rotation="0 180 0" insertvideo interaction animation-mixer
+                    gltf-model="#bedroom"></a-entity>
+            </a-marker>
+
+            <a-entity camera></a-entity>
+        </a-scene>
+    </template>
+</head>
+
+<body style='margin : 0px; overflow: hidden;'></body>
+
+</html>
