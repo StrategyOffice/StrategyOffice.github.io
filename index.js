@@ -13,8 +13,19 @@
     AFRAME.registerComponent('markerlog', {
         init: function () {
             const scene = document.querySelector('a-scene');
-            scene.addEventListener('markerFound', (ev, target) => console.log(ev, target));
-            scene.addEventListener('markerLost', (ev, target) => console.log(ev, target));
+            const video = document.querySelector("#thevideo");
+            if (scene && video) {
+                scene.addEventListener('markerFound', (ev, target) => {
+                    console.log(ev, target);
+                    video.muted = false;
+                });
+                scene.addEventListener('markerLost', (ev, target) => {
+                    console.log(ev, target);
+                    video.muted = true;
+                });
+            } else {
+                console.error("markerlog: failed");
+            }
         },
     });
 
@@ -24,18 +35,41 @@
         init: function () {
             console.log('cursor indicator init');
 
-            window.addEventListener('wheel', (ev) => this.el.object3D.scale.multiplyScalar(ev.deltaY < 0 ? 1.03 : 0.97));
+            const wheelZoomSpeed = -0.05;
+            const pinchZoomSpeed = 0.007;
+            const rotateSpeed = 0.005;
+
+            const scale = (amount) => this.el.object3D.scale.multiplyScalar(1 + amount);
+
+            const rotateX = (amount) => {
+                this.el.object3D.rotateX(amount * rotateSpeed);
+                if (this.el.object3D.rotation.x > 0) this.el.object3D.rotation.x = 0;
+                if (this.el.object3D.rotation.x < -1) this.el.object3D.rotation.x = -1;
+                console.log(this.el.object3D.rotation.x);
+            }
+
+            const rotateY = (amount) => this.el.object3D.rotateY(amount * rotateSpeed);
+
+            window.addEventListener('wheel', (ev) => scale(Math.sign(ev.deltaY) * wheelZoomSpeed));
 
             /* START pinch-zoom */
             // This will NOT work on firefox for android at the time of writing, because the engine version is quite old and does not support the pointer-events specification
             // Global vars to cache event state
             const evCache = [];
+            let prevX = -1;
+            let prevY = -1;
             let prevDiff = -1;
+
 
             const pointerdown_handler = (ev) => {
                 // Start of a touch interaction.
                 // This event is cached to support 2-finger gestures
                 evCache.push(ev);
+
+                if (evCache.length === 1) {
+                    prevX = ev.clientX;
+                    prevY = ev.clientY;
+                }
             };
 
             // 2-pointer pinch to zoom.
@@ -48,8 +82,22 @@
                     }
                 }
 
+                if (evCache.length === 1) {
+                    // TODO: Rotate model
+                    const dx = evCache[0].clientX - prevX;
+                    const dy = evCache[0].clientY - prevY;
+                    prevX = evCache[0].clientX;
+                    prevY = evCache[0].clientY;
+
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        rotateY(dx);
+                    } else {
+                        rotateX(dy);
+                    }
+                }
+
                 // If two pointers are down, check for pinch gestures
-                if (evCache.length == 2) {
+                if (evCache.length === 2) {
                     // Calculate the distance between the two pointers
                     const curDiff = Math.hypot(
                         evCache[0].clientX - evCache[1].clientX,
@@ -58,7 +106,8 @@
 
                     if (prevDiff > 0) {
                         const move = curDiff - prevDiff;
-                        this.el.object3D.scale.multiplyScalar(1 + move / 150);
+                        //this.el.object3D.scale.multiplyScalar(1 + move / 150);
+                        scale(move * pinchZoomSpeed);
                     }
 
                     // Cache the distance for the next move event
@@ -74,10 +123,13 @@
                     }
                 }
 
-                // If the number of pointers down is less than two then reset diff tracker
-                if (evCache.length < 2) {
-                    prevDiff = -1;
+                if (evCache.length < 1) {
+                    prevX = -1;
+                    prevY = -1;
                 }
+
+                // If the number of pointers down is less than two then reset diff tracker
+                if (evCache.length < 2) prevDiff = -1;
             };
 
             window.addEventListener('pointerdown', pointerdown_handler);
@@ -90,7 +142,7 @@
         },
     });
 
-
+    
     // replace the material on a named mesh in the model with the given video
     AFRAME.registerComponent('insertvideo', {
         schema: {
@@ -114,6 +166,9 @@
             this.id	    If the component can have multiple instances, the ID of the individual instance of the component (e.g., foo from sound__foo).
         */
         init: function () {
+            // Wait until the model is loaded, then insert video
+            this.el.addEventListener('model-loaded', () => this.__insertVideo());
+
             // Note: mesh and/or video are not yet ready in this callback
             const events = ['mousedown', 'touchstart', 'keydown'];
 
@@ -129,9 +184,9 @@
             events.map((e) => window.addEventListener(e, startVideo, { passive: true }));
         },
 
-        play: function () {
-            // Note: In this callback, video and mesh should be ready
+        __insertVideo: function () {
             if (this.__init_done) return;
+            console.log('attach video')
 
             if (!this.data.video) {
                 console.error('insertvideo: no video');
@@ -172,7 +227,7 @@
             }
 
             this.__init_done = true;
-        },
+        }
     });
 
 
