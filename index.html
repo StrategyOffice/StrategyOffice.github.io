@@ -6,7 +6,7 @@
 
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-    <script src="vendor/aframe-1.0.4.min.js"></script>
+    <script src="vendor/aframe-v1.1.0.min.js"></script>
     <script src="vendor/AR.js-3.3.1/aframe-ar.js"></script>
     <script src="index.js"></script>
 
@@ -19,25 +19,34 @@
         <!-- <a-scene vr-mode-ui="enabled: false" stats embedded markerlog renderer="logarithmicDepthBuffer: true;"
             arjs='patternRatio: 0.8; trackingMethod: best; sourceType: webcam; debugUIEnabled: false; cameraParametersUrl: /vendor/AR.js-3.3.1/camera_para.dat'> -->
 
-            <a-scene vr-mode-ui="enabled: false" stats embedded markerlog renderer="logarithmicDepthBuffer: true; precision: mediump;"
-            arjs='patternRatio: 0.8; trackingMethod: best; sourceType: image; sourceUrl: trans.png; debugUIEnabled: false; cameraParametersUrl: /vendor/AR.js-3.3.1/camera_para.dat'>
+        <!-- <a-scene light="defaultLightsEnabled: false" vr-mode-ui="enabled: false" stats embedded marker-mute
+            renderer="logarithmicDepthBuffer: true; precision: mediump; colorManagement: true; gammaOutput: true;"
+            arjs='patternRatio: 0.8; trackingMethod: best; sourceType: image; sourceUrl: trans.png; debugUIEnabled: false; cameraParametersUrl: /vendor/AR.js-3.3.1/camera_para.dat'> -->
+
+        <a-scene light="defaultLightsEnabled: false" vr-mode-ui="enabled: false" stats embedded marker-mute
+            renderer="logarithmicDepthBuffer: true; precision: mediump; colorManagement: true; gammaOutput: true;"
+            arjs='patternRatio: 0.8; trackingMethod: best; sourceType: webcam; debugUIEnabled: false; cameraParametersUrl: /vendor/AR.js-3.3.1/camera_para.dat'>
+
 
             <a-assets>
-                <a-asset-item id="booth" src="nenga1219_edited_semifinal_1.glb"></a-asset-item>
-                <!-- <a-asset-item id="booth" src="nenga1219.glb"></a-asset-item> -->
-                
-                <video id="thevideo" muted loop>
-                    <source src="Vrmillion_320p.webm" type="video/webm">
-                    <source src="Vrmillion_360p.m4v" type="video/mp4">
+                <img id="environment-map" src="white.png">
+                <a-asset-item id="booth" src="nenga1219_1.glb"></a-asset-item>
+                <video id="thevideo" poster="white.png" muted loop>
+                    <source src="Vrmillion_180p_150k_40k.webm" type="video/webm">
+                    <source src="Vrmillion_180p_150k_40k.mp4" type="video/mp4">
                 </video>
             </a-assets>
 
-            <a-marker emitevents="true" id="animated-marker" size="10" type='pattern' url='pattern-50.patt'
-                smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
-                <a-entity id="logo" position="0 0 0" rotation="0 45 0" scale="0.1 0.1 0.1" insertvideo interaction animation-mixer
-                    gltf-model="#booth"></a-entity>
+            <a-marker emitevents="true" size="1" type='pattern' url='pattern-50.patt' smooth="true" smoothCount="10"
+                smoothTolerance=".01" smoothThreshold="5">
+                <a-entity interaction>
+                    <a-entity position="0 0 0" rotation="0 45 0" scale="0.1 0.1 0.1" insertvideo environment
+                        gltf-model="#booth"></a-entity>
+                </a-entity>
+                </a-entity>
             </a-marker>
 
+            <a-entity light="type: ambient; color: #FFF; intensity: 1"></a-entity>
             <a-entity camera></a-entity>
         </a-scene>
     </template>
