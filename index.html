@@ -6,17 +6,70 @@
 
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-    <script src="vendor/aframe-v1.1.0.min.js"></script>
-    <script src="vendor/AR.js-3.3.1/aframe-ar.js"></script>
-    <script src="index.js"></script>
+    <style>
+        html {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .message {
+            color: #000;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .message.warning {
+            color: #990;
+        }
+
+        .message.error {
+            color: #B00;
+        }
+    </style>
+
+    <template id="no-camera">
+        <div class="message error">
+            <h1>You do not seem to have a camera</h1>
+            <a href="?fallback=true">Go to static page</a>
+        </div>
+    </template>
+
+    <template id="permission-check">
+        <div class="message">
+            <h1>Please grant camera permission</h1>
+            <a href="?fallback=true">Go to static page</a>
+        </div>
+    </template>
+
+    <template id="permission-denied">
+        <div class="message warning">
+            <h1>Camera permission denied.</h1>
+            <a href="?fallback=true">Go to static page</a>
+        </div>
+    </template>
 
     <template id="landscape-warning">
-        <h1>Use in landscape orientation!</h1>
-        <button id="landscape-btn">Switch to full-screen</button>
+        <div class="message">
+            <h1>Use in landscape orientation!</h1>
+            <button id="landscape-btn">Switch to full-screen</button>
+        </div>
     </template>
 
     <template id="ar-scene">
-        <a-scene light="defaultLightsEnabled: false" vr-mode-ui="enabled: false" stats embedded marker-mute
+        <a-scene light="defaultLightsEnabled: false" vr-mode-ui="enabled: false" embedded marker-mute
             renderer="logarithmicDepthBuffer: true; precision: mediump; colorManagement: true; gammaOutput: true;"
             arjs='patternRatio: 0.8; trackingMethod: best; sourceType: webcam; debugUIEnabled: false; cameraParametersUrl: /vendor/AR.js-3.3.1/camera_para.dat'>
 
@@ -44,6 +97,14 @@
     </template>
 </head>
 
-<body style='margin : 0px; overflow: hidden;'></body>
+<body style='margin: 0px; overflow: hidden;'>
+    <div class="message">
+        <h1>Loading...</h1>
+    </div>
+
+    <script src="vendor/aframe-v1.1.0.min.js"></script>
+    <script src="vendor/AR.js-3.3.1/aframe-ar.js"></script>
+    <script src="index.js"></script>
+</body>
 
 </html>

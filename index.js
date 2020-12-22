@@ -1,6 +1,14 @@
 !function () {
     "use strict";
 
+    const $ = document.querySelector.bind(document);
+
+    const $$ = selector => {
+        const r = $(selector);
+        return r && r.content || null;
+    }
+
+
     window.onerror = function (...args) {
         const e = JSON.stringify(args, null, 2);
         console.error(e);
@@ -314,37 +322,71 @@
         }
     });
 
+    async function hasVideoInput() {
+        return navigator.mediaDevices.enumerateDevices().then(mdi => mdi.some(m => m.kind === 'videoinput'));
+    }
+
+    async function getPermission() {
+        try {
+            const stream = await window.navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                    facingMode: "environment",
+                    width: 32,
+                    height: 32,
+                }
+            });
+
+            for (const track of stream.getTracks()) {
+                track.stop();
+            }
+
+            return true;
+        } catch (e) {
+            console.error(e);
+        }
+
+        return false;
+    }
+
 
     // Controls the window content
     // This is a mainly workaround for tracking not working correcly in portrait mode on chrome.
     // It also shows a warning when the page was not loaded from a server.
-    function init() {
-        const $ = document.querySelector.bind(document);
+    async function load() {
+        const isFallback = new URL(location).searchParams.has("fallback");
+
+        if (isFallback) {
+            const temp = $('#ar-scene');
+            temp.innerHTML = temp.innerHTML.replace("sourceType: webcam;", "sourceType: image; sourceUrl: trans.png;");
+        }
 
         // get the templates
-        const scene = $('#ar-scene').content;
-        const landscapeWarn = $('#landscape-warning').content;
+        const tNoCamera = $$('#no-camera');
+        const tPermCheck = $$('#permission-check');
+        const tPermDenied = $$('#permission-denied');
+        const scene = $$('#ar-scene');
+        const landscapeWarn = $$('#landscape-warning');
 
         // function to replace body content
         const setContent = (content) => {
             document.body.innerHTML = '';
+            document.body.removeAttribute("style");
             const frag = content.cloneNode(true);
             document.body.appendChild(frag);
         };
 
-        const init = () => {
-            if (screen.orientation.type.startsWith('landscape')) {
-                setContent(scene);
-            } else {
-                setContent(landscapeWarn);
-                $('#landscape-btn').addEventListener('click', () =>
-                    document.body.requestFullscreen({
-                        navigationUI: 'hide',
-                    }),
-                );
-            }
+        const landscapeMode = () => {
+            setContent(scene);
+            // ar.js messes up the environment
+            window.addEventListener('orientationchange', () => document.location.reload(), { once: true });
         };
 
+        const portraitMode = () => {
+            setContent(landscapeWarn);
+            $('#landscape-btn').addEventListener('click', () => document.body.requestFullscreen({ navigationUI: 'hide' }));
+            window.addEventListener('orientationchange', landscapeMode, { once: true });
+        };
 
         window.addEventListener('fullscreenerror', (ev) => window.onerror && window.onerror.call(null, ev));
 
@@ -358,9 +400,33 @@
             }
         });
 
-        window.addEventListener('orientationchange', init);
-        init();
+        if (!isFallback) {
+            // check for video input
+            const cameraAvailable = await hasVideoInput();
+            if (tNoCamera && !cameraAvailable) {
+                setContent(tNoCamera);
+                return;
+            }
+
+            // check for permission
+            if (tPermCheck) {
+                setContent(tPermCheck);
+            }
+            const granted = await getPermission();
+            if (tPermDenied && !granted) {
+                setContent(tPermDenied);
+                return;
+            }
+        }
+
+        
+        // need landscape orientation or ar.js will not work correctly
+        if (screen.orientation.type.startsWith('landscape')) {
+            landscapeMode();
+        } else {
+            portraitMode();
+        }
     }
 
-    window.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('DOMContentLoaded', load);
 }();
