@@ -163,7 +163,7 @@
                     if (Math.abs(dx) > Math.abs(dy)) {
                         rotateY(dx);
                     } else {
-                        rotateX(dy);
+                        //rotateX(dy);
                     }
                 }
 
@@ -358,7 +358,7 @@
 
         if (isFallback) {
             const temp = $('#ar-scene');
-            temp.innerHTML = temp.innerHTML.replace("sourceType: webcam;", "sourceType: image; sourceUrl: trans.png;");
+            temp.innerHTML = temp.innerHTML.replace("sourceType: webcam;", "sourceType: image; sourceUrl: FallbackSource.png;");
         }
 
         // get the templates
