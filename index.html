@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="shortcut icon" href="favicon.ico">
 
-    <title>Kacoms NewYear2021</title>
+    <title>Kacoms NewYear 2021</title>
 
     <style>
         html {
@@ -22,6 +22,15 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+        }
+
+        body,
+        h1,
+        h2,
+        div,
+        p,
+        button {
+            font-family: メイリオ, Meiryo, "Hiragino Kaku Gothic Pro W3", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", Arial, sans-serif;
         }
 
         .message {
@@ -45,29 +54,29 @@
 
     <template id="no-camera">
         <div class="message error">
-            <h1>You do not seem to have a camera</h1>
-            <a href="?fallback=true">Go to static page</a>
+            <h1>カメラを検出できませんでした</h1>
+            <a href="?fallback=true">性的ページを表示</a>
         </div>
     </template>
 
     <template id="permission-check">
         <div class="message">
-            <h1>Please grant camera permission</h1>
-            <a href="?fallback=true">Go to static page</a>
+            <h1>カメラ使用を許可してください</h1>
+            <a href="?fallback=true">性的ページを表示</a>
         </div>
     </template>
 
     <template id="permission-denied">
         <div class="message warning">
-            <h1>Camera permission denied.</h1>
-            <a href="?fallback=true">Go to static page</a>
+            <h1>カメラ使用は却下されました</h1>
+            <a href="?fallback=true">性的ページを表示</a>
         </div>
     </template>
 
     <template id="landscape-warning">
         <div class="message">
-            <h1>Use in landscape orientation!</h1>
-            <button id="landscape-btn">Switch to full-screen</button>
+            <h1>画面を横向きにしてください</h1>
+            <button id="landscape-btn">横向きフルスクリーンに切り替える</button>
         </div>
     </template>
 
@@ -102,7 +111,8 @@
 
 <body>
     <div class="message">
-        <h1>Loading...</h1>
+        <h1>読み込み中...</h1>
+        <h2>しばらくお待ちください。</h2>
     </div>
 
     <script src="vendor/aframe-v1.1.0.min.js"></script>
