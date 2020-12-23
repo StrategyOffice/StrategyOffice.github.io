@@ -161,7 +161,7 @@
                     prevY = evCache[0].clientY;
 
                     if (Math.abs(dx) > Math.abs(dy)) {
-                        rotateY(dx);
+                        //rotateY(dx);
                     } else {
                         //rotateX(dy);
                     }
