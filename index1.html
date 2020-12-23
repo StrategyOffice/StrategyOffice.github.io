@@ -1,0 +1,123 @@
+<!doctype HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <title>Kacoms NewYear 2021</title>
+
+    <style>
+        html {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body,
+        h1,
+        h2,
+        div,
+        p,
+        button {
+            font-family: メイリオ, Meiryo, "Hiragino Kaku Gothic Pro W3", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", Arial, sans-serif;
+        }
+
+        .message {
+            color: #000;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .message.warning {
+            color: #990;
+        }
+
+        .message.error {
+            color: #B00;
+        }
+    </style>
+
+    <template id="no-camera">
+        <div class="message error">
+            <h1>カメラを検出できませんでした</h1>
+            <a href="?fallback=true">静的ページを表示</a>
+        </div>
+    </template>
+
+    <template id="permission-check">
+        <div class="message">
+            <h1>カメラ使用を許可してください</h1>
+            <a href="?fallback=true">静的ページを表示</a>
+        </div>
+    </template>
+
+    <template id="permission-denied">
+        <div class="message warning">
+            <h1>カメラ使用は却下されました</h1>
+            <a href="?fallback=true">静的ページを表示</a>
+        </div>
+    </template>
+
+    <template id="landscape-warning">
+        <div class="message">
+            <h1>画面を横向きにしてください</h1>
+            <button id="landscape-btn">横向きフルスクリーンに切り替える</button>
+        </div>
+    </template>
+
+    <template id="ar-scene">
+        <a-scene light="defaultLightsEnabled: false" vr-mode-ui="enabled: false" embedded marker-mute
+            renderer="logarithmicDepthBuffer: true; precision: mediump; colorManagement: true; gammaOutput: true;"
+            arjs='patternRatio: 0.8; trackingMethod: best; sourceType: webcam; debugUIEnabled: false; cameraParametersUrl: /vendor/AR.js-3.3.1/camera_para.dat'>
+
+            <a-assets>
+                <img id="environment-map" src="white.png">
+                <a-asset-item id="booth" src="nenga1219_1.glb"></a-asset-item>
+                <video id="thevideo" poster="white.png" muted loop>
+                    <source src="Vrmillion_256_150k_40k.webm" type="video/webm">
+                    <source src="Vrmillion_256_150k_40k.m4v" type="video/mp4">
+                </video>
+            </a-assets>
+
+            <a-marker emitevents="true" size="1" type='pattern' url='pattern-50.patt' smooth="true" smoothCount="10"
+                smoothTolerance=".01" smoothThreshold="5">
+                <a-entity interaction>
+                    <a-entity position="0 0 0" rotation="0 45 0" scale="0.25 0.25 0.25" insertvideo environment
+                        gltf-model="#booth"></a-entity>
+                </a-entity>
+                </a-entity>
+            </a-marker>
+
+            <a-entity light="type: ambient; color: #FFF; intensity: 1"></a-entity>
+            <a-entity camera></a-entity>
+        </a-scene>
+    </template>
+</head>
+
+<body>
+    <div class="message">
+        <h1>読み込み中...</h1>
+        <h2>しばらくお待ちください。</h2>
+    </div>
+
+    <script src="vendor/aframe-v1.1.0.min.js"></script>
+    <script src="vendor/AR.js-3.3.1/aframe-ar.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
