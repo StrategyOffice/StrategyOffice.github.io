@@ -87,7 +87,7 @@
 
             <a-assets>
                 <img id="environment-map" src="white.png">
-                <a-asset-item id="booth" src="nenga1219_1.glb"></a-asset-item>
+                <a-asset-item id="booth" src="nenga1222_1.glb"></a-asset-item>
                 <video id="thevideo" poster="white.png" muted loop>
                     <source src="Vrmillion_256_150k_40k.webm" type="video/webm">
                     <source src="Vrmillion_256_150k_40k.m4v" type="video/mp4">
@@ -96,14 +96,14 @@
 
             <a-marker emitevents="true" size="1" type='pattern' url='pattern-50.patt' smooth="true" smoothCount="10"
                 smoothTolerance=".01" smoothThreshold="5">
-                <a-entity interaction>
+                <a-entity interaction look-controls="reverseMouseDrag: true; reverseTouchDrag: true;">
                     <a-entity position="0 0 0" rotation="0 45 0" scale="0.25 0.25 0.25" insertvideo environment
                         gltf-model="#booth"></a-entity>
                 </a-entity>
                 </a-entity>
             </a-marker>
 
-            <a-entity light="type: ambient; color: #FFF; intensity: 1"></a-entity>
+            <a-entity light="type: ambient; color: #FFF; intensity: 0.6"></a-entity>
             <a-entity camera></a-entity>
         </a-scene>
     </template>
