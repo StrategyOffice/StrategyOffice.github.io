@@ -1,6 +1,6 @@
-!function () {
-    "use strict";
+// tsc --allowJs --target es6 --sourceMap --removeComments --strict --outFile www_root/index.es6.js www_root/index.js
 
+!function () {
     const $ = document.querySelector.bind(document);
 
     const $$ = selector => {
@@ -12,6 +12,7 @@
     window.onerror = function (...args) {
         const e = JSON.stringify(args, null, 2);
         console.error(e);
+        alert(e);
     };
 
 
