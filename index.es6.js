@@ -8,16 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+window.onerror = function (...args) {
+    const e = JSON.stringify(args, null, 2);
+    console.error(e);
+    alert(e);
+};
 !function () {
     const $ = document.querySelector.bind(document);
     const $$ = selector => {
         const r = $(selector);
         return r && r.content || null;
-    };
-    window.onerror = function (...args) {
-        const e = JSON.stringify(args, null, 2);
-        console.error(e);
-        alert(e);
     };
     AFRAME.registerComponent('material-log', {
         init: function () {
@@ -279,8 +279,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         });
     }
     function load() {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const isFallback = new URL(location).searchParams.has("fallback");
+            const supportsOrientation = 'screen' in window && 'orientation' in window.screen && 'type' in window.screen.orientation;
+            const supportsFullscreen = supportsOrientation && 'lock' in window.screen.orientation && 'unlock' in window.screen.orientation;
+            if (supportsOrientation) {
+                document.body.classList.add("supports-orientation");
+            }
+            if (supportsFullscreen) {
+                document.body.classList.add("supports-fullscreen");
+            }
             if (isFallback) {
                 const temp = $('#ar-scene');
                 temp.innerHTML = temp.innerHTML.replace("sourceType: webcam;", "sourceType: image; sourceUrl: FallbackSource.png;");
@@ -298,24 +307,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             };
             const landscapeMode = () => {
                 setContent(scene);
-                window.addEventListener('orientationchange', () => document.location.reload(), { once: true });
+                if (supportsOrientation) {
+                    window.addEventListener('orientationchange', () => document.location.reload(), { once: true });
+                }
             };
             const portraitMode = () => {
                 setContent(landscapeWarn);
-                $('#landscape-btn').addEventListener('click', () => document.body.requestFullscreen({ navigationUI: 'hide' }));
-                window.addEventListener('orientationchange', landscapeMode, { once: true });
+                if (supportsOrientation) {
+                    $('#landscape-btn').addEventListener('click', () => document.body.requestFullscreen({ navigationUI: 'hide' }));
+                    window.addEventListener('orientationchange', landscapeMode, { once: true });
+                }
             };
-            window.addEventListener('fullscreenerror', (ev) => window.onerror && window.onerror.call(null, ev));
-            window.addEventListener('fullscreenchange', () => {
-                if (document.fullscreenElement) {
-                    console.log('entered fullscreen');
-                    screen.orientation.lock('landscape');
-                }
-                else {
-                    console.log('exited fullscreen');
-                    screen.orientation.unlock();
-                }
-            });
+            if (supportsFullscreen) {
+                window.addEventListener('fullscreenerror', (ev) => window.onerror && window.onerror.call(null, ev));
+                window.addEventListener('fullscreenchange', () => {
+                    if (document.fullscreenElement) {
+                        console.log('entered fullscreen');
+                        screen.orientation.lock('landscape');
+                    }
+                    else {
+                        console.log('exited fullscreen');
+                        screen.orientation.unlock();
+                    }
+                });
+            }
             if (!isFallback) {
                 const cameraAvailable = yield hasVideoInput();
                 if (tNoCamera && !cameraAvailable) {
@@ -331,11 +346,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                     return;
                 }
             }
-            if (screen.orientation.type.startsWith('landscape')) {
-                landscapeMode();
+            if (supportsOrientation) {
+                if ((_b = (_a = screen === null || screen === void 0 ? void 0 : screen.orientation) === null || _a === void 0 ? void 0 : _a.type) === null || _b === void 0 ? void 0 : _b.startsWith('landscape')) {
+                    landscapeMode();
+                }
+                else {
+                    portraitMode();
+                }
             }
             else {
-                portraitMode();
+                landscapeMode();
             }
         });
     }

@@ -1,5 +1,12 @@
 // tsc --allowJs --target es6 --sourceMap --removeComments --strict --outFile www_root/index.es6.js www_root/index.js
 
+window.onerror = function (...args) {
+    const e = JSON.stringify(args, null, 2);
+    console.error(e);
+    alert(e);
+};
+
+
 !function () {
     const $ = document.querySelector.bind(document);
 
@@ -7,13 +14,6 @@
         const r = $(selector);
         return r && r.content || null;
     }
-
-
-    window.onerror = function (...args) {
-        const e = JSON.stringify(args, null, 2);
-        console.error(e);
-        alert(e);
-    };
 
 
     AFRAME.registerComponent('material-log', {
@@ -356,6 +356,16 @@
     // It also shows a warning when the page was not loaded from a server.
     async function load() {
         const isFallback = new URL(location).searchParams.has("fallback");
+        const supportsOrientation = 'screen' in window && 'orientation' in window.screen && 'type' in window.screen.orientation;
+        const supportsFullscreen = supportsOrientation && 'lock' in window.screen.orientation && 'unlock' in window.screen.orientation;
+
+        if (supportsOrientation) {
+            document.body.classList.add("supports-orientation");
+        }
+
+        if (supportsFullscreen) {
+            document.body.classList.add("supports-fullscreen");
+        }
 
         if (isFallback) {
             const temp = $('#ar-scene');
@@ -379,27 +389,33 @@
 
         const landscapeMode = () => {
             setContent(scene);
-            // ar.js messes up the environment
-            window.addEventListener('orientationchange', () => document.location.reload(), { once: true });
+            if (supportsOrientation) {
+                // ar.js messes up the environment
+                window.addEventListener('orientationchange', () => document.location.reload(), { once: true });
+            }
         };
 
         const portraitMode = () => {
             setContent(landscapeWarn);
-            $('#landscape-btn').addEventListener('click', () => document.body.requestFullscreen({ navigationUI: 'hide' }));
-            window.addEventListener('orientationchange', landscapeMode, { once: true });
+            if (supportsOrientation) {
+                $('#landscape-btn').addEventListener('click', () => document.body.requestFullscreen({ navigationUI: 'hide' }));
+                window.addEventListener('orientationchange', landscapeMode, { once: true });
+            }
         };
 
-        window.addEventListener('fullscreenerror', (ev) => window.onerror && window.onerror.call(null, ev));
+        if (supportsFullscreen) {
+            window.addEventListener('fullscreenerror', (ev) => window.onerror && window.onerror.call(null, ev));
 
-        window.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement) {
-                console.log('entered fullscreen');
-                screen.orientation.lock('landscape');
-            } else {
-                console.log('exited fullscreen');
-                screen.orientation.unlock();
-            }
-        });
+            window.addEventListener('fullscreenchange', () => {
+                if (document.fullscreenElement) {
+                    console.log('entered fullscreen');
+                    screen.orientation.lock('landscape');
+                } else {
+                    console.log('exited fullscreen');
+                    screen.orientation.unlock();
+                }
+            });
+        }
 
         if (!isFallback) {
             // check for video input
@@ -420,12 +436,15 @@
             }
         }
 
-        
-        // need landscape orientation or ar.js will not work correctly
-        if (screen.orientation.type.startsWith('landscape')) {
-            landscapeMode();
+        if (supportsOrientation) {
+            // need landscape orientation or ar.js will not work correctly
+            if (screen?.orientation?.type?.startsWith('landscape')) {
+                landscapeMode();
+            } else {
+                portraitMode();
+            }
         } else {
-            portraitMode();
+            landscapeMode();
         }
     }
 

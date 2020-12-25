@@ -33,6 +33,14 @@
             font-family: メイリオ, Meiryo, "Hiragino Kaku Gothic Pro W3", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", Arial, sans-serif;
         }
 
+        .landscape-btn {
+            display: none;
+        }
+
+        .supports-fullscreen .landscape-btn {
+            display: inline;
+        }
+
         .message {
             color: #000;
             width: 100vw;
@@ -76,7 +84,12 @@
     <template id="landscape-warning">
         <div class="message">
             <h1>画面を横向きにしてください</h1>
-            <button id="landscape-btn">横向きフルスクリーンに切り替える</button>
+            <p>
+                <button id="landscape-btn">横向きフルスクリーンに切り替える</button>
+            </p>
+            <p>
+                <a href="?fallback=true">静的ページを表示</a>
+            </p>
         </div>
     </template>
 
